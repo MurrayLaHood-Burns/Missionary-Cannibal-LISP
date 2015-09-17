@@ -1,4 +1,94 @@
 #|
+					***** MISSIONARIES.LSP *****
+					
+Missionary and Cannibal Problem:
+	Move all M missionaries and C cannibals from the left side of a river to the
+right. Can only use a rowboat that fits a maximum of two people, and if either
+shore has 1 or more missionaries out numbered by cannibals, the cannibals will
+eat them. Calls DFS search routine in search.lsp, and ascii art in ascii.lsp.
+
+Usage: clisp missionaries
+Usage within clisp interpreter: (load 'missionaries)
+
+Authors: John Mangold, Murray LaHood-Burns
+Written Spring 2015 for CSC461 PL class, programming assignment 2.
+
+Modifications:
+|#
+
+;-------------------------------------------------------------------------------
+
+; global variables
+(defvar *M*)		; number of missionaries
+(defvar *C*)		; number of cannibals
+
+;-------------------------------------------------------------------------------
+
+; load DFS routine and ascii art from external files
+(load 'ascii)
+(load 'search)
+(load 'print)
+
+;-------------------------------------------------------------------------------
+
+; usage statement displayed at file load time
+#|
+	Author: John Mangold
+	Description: Prints a description and usage for the program.
+	Arguments: None
+|#
+(defun initial_usage ()
+	(format t "~%~%This is a recursive solution to the missionaries and ~%")
+	(format t "cannibals problem.  It uses a depth first search to solve ~%")
+	(format t "the problem.~%~%")
+	(format t "Usage: (m-c m c)~%")
+	(format t "        m - number of missionaries~%")
+	(format t "        c - number of cannibals~%~%")
+)
+
+;-------------------------------------------------------------------------------
+
+; Missionary and Cannibal Problem
+#|
+	Author: Murray Lahood-Burns, John Mangold
+	Description: First function to call.  Handles all other function calls.
+		     Sets variables then calls a depth first search which returns
+		     a list which is then passed to the print function which
+		     prints everything out.
+	Arguments: m - starting number of missionaries on left bank
+		   c - starting number of cannibals on right bank
+	Returns: None
+|#
+(defun m-c (m c)
+	; variable check
+	(format t "~%There are ~d missionaries and ~d cannibals.~%~%" m c )
+
+	; check for unsolvable problem instance
+	(when (< m c) (defeat) (return-from m-c "The cannibals have feasted!!!"))
+
+	; initialize global vars
+	(setf *M* m)
+	(setf *C* c)
+
+	; solve missionary/cannibal problem using DFS
+
+	(print_mc (dfs (start-state)))
+
+	; suppress printing NIL upon return to interpreter
+	(values)
+)
+
+; Define the start state
+#|
+	Author: John Mangold
+	Description: Generates the initial state for the game
+	Arguments: None
+	Returns: start state list
+|#
+(defun start-state () (list *M* *C* "left" ) )
+
+; Define the goal state
+#|
 	Author: John Mangold
 	Description: Checks the given state to see if it matches the goal state.
 	Arguments: state
